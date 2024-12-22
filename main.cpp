@@ -28,6 +28,26 @@ struct FileHeader {
 
 #pragma pack(pop)
 
+void HeadersOut(vector <char> data)
+{
+    VolumeHeadeer* vm_header = reinterpret_cast <VolumeHeadeer*> (&data[7]);
+    int displace = 7 + int(vm_header -> header_size);
+
+    while (int(data[displace+2]) == 116)
+    {
+        VolumeHeadeer* vf_header = reinterpret_cast <VolumeHeadeer*> (&data[displace]);
+        FileHeader* v_header = reinterpret_cast <FileHeader*> (&data[displace+7]);
+
+        for (int i = 0; i < (int(v_header -> NameSize)); i++)
+        {
+            cout << char(data[displace + 32 + i]);
+        }
+        cout << endl << endl;
+
+        displace += int(vf_header -> header_size) + int(v_header -> PackSize);
+    }
+}
+
 int main()
 {
     ifstream file("Data.rar", ios::binary);
@@ -40,6 +60,7 @@ int main()
         vector <char> rData(size, 0);
         file.read(rData.data(), size);
 
+        HeadersOut(rData);
     }
 
     return 0;
